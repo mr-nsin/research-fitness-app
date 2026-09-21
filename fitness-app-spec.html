@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home-first fitness app — feature plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1F2F0;
+    --surface:#FBFBFA;
+    --ink:#15191E;
+    --ink-soft:#5B6572;
+    --rule:#D6D9D4;
+    --accent:#1B45F0;
+    --accent-soft:#E2E7FF;
+    --keep:#1F7A4D;
+    --add:#1B45F0;
+    --watch:#A6231A;
+    --shell:#E8EAE6;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#101316; --surface:#171B1F; --ink:#E7E9E6; --ink-soft:#9AA3AD;
+      --rule:#2A3037; --accent:#8AA0FF; --accent-soft:#1D2540;
+      --keep:#5CC48E; --watch:#F0857A; --add:#8AA0FF; --shell:#1B1F24;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#101316; --surface:#171B1F; --ink:#E7E9E6; --ink-soft:#9AA3AD;
+    --rule:#2A3037; --accent:#8AA0FF; --accent-soft:#1D2540;
+    --keep:#5CC48E; --watch:#F0857A; --add:#8AA0FF; --shell:#1B1F24;
+  }
+  *,*::before,*::after{box-sizing:inherit}
+  html{scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 1.5rem)}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Source Serif 4",Georgia,"Times New Roman",serif;
+    font-size:18px;line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.ui{font-family:Archivo,"Helvetica Neue",Arial,sans-serif;}
+
+  .wrap{max-width:1140px;margin:0 auto;padding:0 clamp(1.1rem,4vw,2.5rem)}
+
+  /* hero */
+  header.hero{padding:clamp(3rem,9vw,6rem) 0 2.5rem;border-bottom:1px solid var(--rule)}
+  .kicker{font-family:Archivo,sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.01em;color:var(--accent);margin:0 0 1.2rem}
+  h1{
+    font-size:clamp(2.1rem,6.4vw,4.1rem);line-height:1.04;font-weight:700;
+    letter-spacing:-.025em;margin:0;max-width:17ch;
+  }
+  .sub{margin:1.4rem 0 0;max-width:60ch;color:var(--ink-soft);font-size:1.05rem}
+
+  /* session strip */
+  .strip{margin:2.8rem 0 0}
+  .strip-label{font-family:Archivo,sans-serif;font-size:.8rem;color:var(--ink-soft);margin:0 0 .6rem}
+  .bar{display:flex;height:64px;border:1px solid var(--rule);background:var(--surface);overflow:hidden;border-radius:3px}
+  .seg{display:flex;flex-direction:column;justify-content:center;padding:0 .85rem;border-right:1px solid var(--rule);font-family:Archivo,sans-serif;min-width:0}
+  .seg:last-child{border-right:0}
+  .seg b{font-size:.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .seg span{font-size:.72rem;color:var(--ink-soft)}
+  .s-warm{flex:1.1;background:var(--accent-soft)}
+  .s-work{flex:3;background:var(--surface)}
+  .s-cool{flex:1.1;background:var(--accent-soft)}
+  .strip-note{margin:.75rem 0 0;font-size:.92rem;color:var(--ink-soft);max-width:62ch}
+
+  /* layout */
+  .cols{display:grid;grid-template-columns:200px minmax(0,1fr);gap:clamp(2rem,5vw,4rem);padding:3rem 0 4rem}
+  nav.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 1.5rem);align-self:start;font-family:Archivo,sans-serif;font-size:.85rem}
+  nav.rail ol{list-style:none;margin:0;padding:0}
+  nav.rail li{margin:0 0 .55rem}
+  nav.rail a{color:var(--ink-soft);text-decoration:none;display:block;padding:.15rem 0}
+  nav.rail a:hover,nav.rail a:focus-visible{color:var(--accent)}
+  nav.rail a[aria-current="true"]{color:var(--ink);font-weight:600;box-shadow:inset 2px 0 0 var(--accent);padding-left:.6rem}
+  @media (max-width:860px){ .cols{grid-template-columns:1fr;padding-top:1rem} nav.rail{display:none} }
+
+  /* sticky section bar for narrow screens */
+  .jump{
+    display:none;position:sticky;top:0;z-index:20;
+    background:var(--paper);border-bottom:1px solid var(--rule);
+    padding-top:env(safe-area-inset-top,0px);
+  }
+  .jump-inner{display:flex;gap:.4rem;overflow-x:auto;padding:.55rem clamp(1.1rem,4vw,2.5rem);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .jump-inner::-webkit-scrollbar{display:none}
+  .jump a{
+    flex:0 0 auto;font-family:Archivo,sans-serif;font-size:.82rem;font-weight:500;
+    text-decoration:none;color:var(--ink-soft);background:var(--surface);
+    border:1px solid var(--rule);border-radius:999px;padding:.32rem .7rem;white-space:nowrap;
+  }
+  .jump a[aria-current="true"]{color:var(--paper);background:var(--accent);border-color:var(--accent)}
+  @media (max-width:860px){ .jump{display:block} html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 3.6rem)} }
+
+  .toplink{display:inline-block;margin:0 0 2rem;font-family:Archivo,sans-serif;font-size:.85rem;text-decoration:none}
+  .toplink:hover{text-decoration:underline}
+
+  section{padding:0 0 3.4rem;max-width:74ch}
+  .num{
+    font-family:Archivo,sans-serif;font-size:.8rem;font-weight:600;color:var(--accent);
+    display:block;margin:0 0 .35rem
+  }
+  h2{font-size:clamp(1.45rem,3.4vw,2rem);line-height:1.15;letter-spacing:-.02em;font-weight:700;margin:0 0 .5rem}
+  h3{font-size:1.02rem;font-weight:600;letter-spacing:-.005em;margin:2rem 0 .5rem}
+  p{margin:0 0 1rem}
+  .lede{color:var(--ink-soft)}
+
+  /* annotated items */
+  .item{border-left:3px solid var(--rule);padding:.15rem 0 .15rem 1rem;margin:0 0 1.15rem}
+  .item.keep{border-color:var(--keep)}
+  .item.add{border-color:var(--add)}
+  .item.watch{border-color:var(--watch)}
+  .tag{font-family:Archivo,sans-serif;font-size:.74rem;font-weight:600;display:block;margin:0 0 .15rem}
+  .keep .tag{color:var(--keep)}
+  .add .tag{color:var(--add)}
+  .watch .tag{color:var(--watch)}
+  .item p{margin:0;font-size:.98rem}
+
+  ul.plain{margin:0 0 1.2rem;padding:0 0 0 1.1rem}
+  ul.plain li{margin:0 0 .45rem}
+
+  /* question table */
+  .qs{width:100%;border-collapse:collapse;font-size:.94rem;margin:0 0 1.3rem;display:block;overflow-x:auto}
+  .qs table{width:100%;border-collapse:collapse;min-width:460px}
+  .qs th,.qs td{text-align:left;padding:.55rem .8rem .55rem 0;border-bottom:1px solid var(--rule);vertical-align:top}
+  .qs th{font-family:Archivo,sans-serif;font-size:.78rem;font-weight:600;color:var(--ink-soft)}
+
+  .callout{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:1.1rem 1.2rem;margin:0 0 1.3rem}
+  .callout p:last-child{margin:0}
+  .callout strong{font-family:Archivo,sans-serif;font-size:.95rem}
+
+  /* phases */
+  .phase{border-top:2px solid var(--ink);padding:1rem 0 1.4rem}
+  .phase h3{margin:0 0 .3rem;font-size:1.1rem}
+  .phase .when{font-family:Archivo,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:0 0 .7rem}
+
+  footer{border-top:1px solid var(--rule);padding:2rem 0 3.5rem;font-size:.92rem;color:var(--ink-soft)}
+  a{color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<nav class="jump" aria-label="Jump to section">
+  <div class="jump-inner">
+    <a href="#top">Top</a>
+    <a href="#s1">1 Onboarding</a>
+    <a href="#s2">2 Home screen</a>
+    <a href="#s3">3 Plan &amp; stretching</a>
+    <a href="#s4">4 Form camera</a>
+    <a href="#s5">5 Timer</a>
+    <a href="#s6">6 Progress</a>
+    <a href="#s7">7 Food</a>
+    <a href="#s8">8 What's missing</a>
+    <a href="#s9">9 Build order</a>
+    <a href="#s10">10 Open questions</a>
+  </div>
+</nav>
+
+<div class="wrap" id="top">
+  <header class="hero">
+    <p class="kicker">Product plan — home users first, gym users second</p>
+    <h1>A training app that warms you up and cools you down every single time.</h1>
+    <p class="sub">Your seven points, tightened into a build order, plus the pieces that are missing and the two features most likely to sink the timeline if they go into version one.</p>
+
+    <div class="strip">
+      <p class="strip-label">The session shape — your actual differentiator</p>
+      <div class="bar">
+        <div class="seg s-warm"><b>Warm-up</b><span>4–6 min, matched to today's muscles</span></div>
+        <div class="seg s-work"><b>Work</b><span>20–22 min, adapts if you fade</span></div>
+        <div class="seg s-cool"><b>Cool-down</b><span>4–6 min, stretch the same muscles</span></div>
+      </div>
+      <p class="strip-note">No other mainstream app bookends every session automatically. Make this the thing people describe when they recommend you, not a checkbox in a feature list.</p>
+    </div>
+  </header>
+
+  <div class="cols">
+    <nav class="rail" aria-label="Sections">
+      <ol>
+        <li><a href="#s1">1 · Onboarding</a></li>
+        <li><a href="#s2">2 · Home screen</a></li>
+        <li><a href="#s3">3 · Plan &amp; stretching</a></li>
+        <li><a href="#s4">4 · Form camera</a></li>
+        <li><a href="#s5">5 · Timer</a></li>
+        <li><a href="#s6">6 · Progress</a></li>
+        <li><a href="#s7">7 · Food</a></li>
+        <li><a href="#s8">8 · What's missing</a></li>
+        <li><a href="#s9">9 · Build order</a></li>
+        <li><a href="#s10">10 · Open questions</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <section id="s1">
+        <span class="num">Section 1</span>
+        <h2>Onboarding</h2>
+        <p class="lede">Your list is right. The risk is length. Asking for height, weight, goals, injuries, equipment and daily food before the user has done anything is the single most common cause of first-day drop-off, and roughly 80% of fitness app users are gone inside 30 days.</p>
+
+        <div class="qs">
+          <table>
+            <tr><th>Ask now (before first session)</th><th>Ask later (after session 1 or 2)</th></tr>
+            <tr><td>Goal — lose fat, build muscle, get stronger, stay active, fix posture</td><td>Name</td></tr>
+            <tr><td>Where you'll train — home, community gym, full gym</td><td>Typical daily food</td></tr>
+            <tr><td>Equipment you actually own</td><td>Body-part focus</td></tr>
+            <tr><td>Pain and injury areas</td><td>Target weight or date</td></tr>
+            <tr><td>Experience level — never trained / on and off / trains regularly</td><td>Diet type, allergies</td></tr>
+            <tr><td>Days per week and minutes per session</td><td>Notification preferences</td></tr>
+            <tr><td>Age and sex (affects load and rest)</td><td>Photos and measurements</td></tr>
+          </table>
+        </div>
+
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Time available per session, and days per week. Everything downstream depends on it, and almost nobody asks it properly. A person with 20 minutes needs a different plan, not a shortened one.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Equipment as a picture grid, not a text list — dumbbells, resistance band, mat, chair, wall, pull-up bar, kettlebell, bench, nothing at all. "Nothing at all" must produce a real plan, because that is a large share of home users.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Space and noise. A first-floor flat with neighbours below rules out jumping jacks and burpees. One tap, big payoff in trust.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Two or three health flags: pregnancy or postpartum, high blood pressure or heart condition, recent surgery. Route these to a gentler plan and show a short line recommending a doctor's clearance.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>Pain areas need a follow-up, not just a body map. "Knee" could mean old ACL surgery or soreness from yesterday. Ask one question: is this an injury you've been treated for, or general discomfort? Then hard-exclude contraindicated movements and log why, so the user sees "skipping lunges because of your knee" rather than silently missing exercises.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>Showing ratings and "why we're better than others" inside onboarding reads as a sales pitch at the exact moment the user wants to start. Put the social proof on the app-store page and the paywall instead.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>The 30/60/90-day body-change preview is standard, and effective, but only promise what you can defend. A vague silhouette plus a realistic weight range beats a dramatic before-after, which invites refund requests and app-store complaints.</p>
+        </div>
+
+        <div class="callout">
+          <p><strong>The onboarding payoff screen</strong></p>
+          <p>End with the plan itself, not a paywall. Show week one laid out — the actual exercise names, the warm-up, the duration — and a single button that says "Start today's session." Paywall after the first completed workout, when the user has felt something.</p>
+        </div>
+      </section>
+
+      <section id="s2">
+        <span class="num">Section 2</span>
+        <h2>Home screen</h2>
+        <p class="lede">You said you weren't sure what belongs here. Here's the strongest answer: one decision, made for them.</p>
+        <p>A grid of exercises to choose from puts the burden back on the user. Choice paralysis is a leading cause of abandonment — a person opens the app, spends four minutes deciding, loses momentum, and closes it. Your onboarding already collected everything needed to decide for them.</p>
+
+        <h3>Top to bottom</h3>
+        <ul class="plain">
+          <li><strong>Today's session card.</strong> Name, duration, the muscles it hits, and one primary button: Start. This occupies the top half of the screen.</li>
+          <li><strong>Two small alternatives underneath.</strong> "Only have 15 minutes" and "Swap today's session." This gives control without forcing a choice.</li>
+          <li><strong>Streak or week strip.</strong> Seven dots for the week, filled as they train. Small. Not a guilt engine — see the note below.</li>
+          <li><strong>One progress number.</strong> Sessions completed, or weight change if they've opted into weigh-ins. Not both, not five.</li>
+          <li><strong>Food entry point.</strong> A single row: what you've logged today, one tap to add.</li>
+        </ul>
+
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>A rest day is a designed screen, not an empty one. Show a mobility or walk suggestion and why rest matters. Empty screens on rest days teach people the app has nothing for them today, and that's how the habit breaks.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>Daily weight on the home screen backfires for a lot of users. Weight fluctuates 1–2 kg a day on water alone, and research into the top fitness apps found that rigid numeric feedback produced shame, demotivation, and people quitting the app and the exercise together. Default to weekly weigh-ins and show a trend line, never a single day's number.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>"Scores" need a definition before you build them. If a score can drop, you've built a punishment system. Consider making it only additive — effort earns points, missing a day earns zero, nothing is ever taken away.</p>
+        </div>
+      </section>
+
+      <section id="s3">
+        <span class="num">Section 3</span>
+        <h2>The plan, and the stretching bookend</h2>
+        <p class="lede">This is your best idea. Build the whole product around it.</p>
+        <p>Automatic warm-up and cool-down attached to every session — matched to the muscles being trained, not a generic five-minute stretch — is a real gap. It also gives you clear marketing: fewer cramps, less next-day soreness, safer for beginners and older users.</p>
+
+        <div class="item keep">
+          <span class="tag">Keep</span>
+          <p>Warm-up and cool-down included by default in every session, including single-body-part sessions.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Get the physiology right or the claim collapses. Warm-ups should be dynamic — leg swings, arm circles, light versions of the movement to come. Cool-downs should be static holds of 20–30 seconds on the muscles just worked. Static stretching before lifting temporarily reduces strength, so don't put it at the front.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Let users skip the warm-up, but make it one deliberate tap and track how often it happens. If most people skip it, your stretches are too long or too boring, and you need to know that early.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Progression rules. A plan that gives the same workout in week six as week one is the most common complaint against AI workout apps. Define the rule now: add reps, then sets, then load, then harder variation. Ask after each session "how hard was that?" on a three-point scale, and let that answer drive next week.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Substitution. Every exercise needs an easier version, a harder version, and a no-equipment version. This single system covers injuries, missing equipment, bad days, and progression at once — build it as one mechanism rather than four.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>Content is the real cost here. A credible home library needs roughly 120–180 exercises, each with a clean demo, muscle tags, difficulty tier, equipment tag, and two substitutions. Budget for that before you budget for AI.</p>
+        </div>
+      </section>
+
+      <section id="s4">
+        <span class="num">Section 4</span>
+        <h2>The camera form-checker</h2>
+        <p class="lede">The most exciting feature on your list, and the one most likely to delay launch by six months. Plan it as version two.</p>
+
+        <div class="callout">
+          <p><strong>Why it's hard</strong></p>
+          <p>On-device pose estimation works, but usable form correction needs the phone propped at the right height and angle, the whole body in frame, decent light, and loose clothing not confusing the joint tracking. Home users train in small rooms with nowhere to prop a phone. It also drains battery fast, it can't see depth well from one camera, and telling someone their squat is safe when it isn't carries real liability.</p>
+        </div>
+
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Ship a cheaper version of the same promise first. Text and audio form cues at the start of each set — "chest up, knees tracking over toes, don't let them cave in" — plus a mirror-check prompt. Most beginner form errors are the same five mistakes per exercise, and a coach's voice catches most of them without any computer vision.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>When you do build it, start with three or four exercises only — squat, push-up, plank, lunge. Depth and knee position on a bodyweight squat are tractable. A deadlift is not.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Say clearly and repeatedly that video never leaves the phone. Camera plus body plus a stranger's server is the fastest way to lose Indian users, women especially. Process on-device, store nothing, and make that a headline, not a privacy-policy line.</p>
+        </div>
+        <div class="item keep">
+          <span class="tag">Keep</span>
+          <p>The fatigue-and-adapt idea is excellent and needs no camera. Just ask. A "too hard" button on the timer screen that instantly cuts the set short, extends rest, or drops to an easier variation — and then changes tomorrow's session — delivers most of the value at a fraction of the cost.</p>
+        </div>
+      </section>
+
+      <section id="s5">
+        <span class="num">Section 5</span>
+        <h2>Timer and session player</h2>
+        <p class="lede">Unglamorous, and the screen people spend all their time on. Get it right and a lot of complaints never happen.</p>
+        <ul class="plain">
+          <li>Auto-advance through exercise, rest, next exercise, with an audio count-in so nobody stares at the phone mid-set.</li>
+          <li>Voice cues that work with the screen off and with music playing — duck the music, don't stop it.</li>
+          <li>Keep the screen awake during a session, and survive a phone call or a notification mid-set without losing progress.</li>
+          <li>Pause, skip, add 30 seconds of rest, and go back one exercise. All reachable with sweaty hands and one thumb.</li>
+          <li>Rep-based exercises need a "done" tap, not a countdown — people move at different speeds.</li>
+          <li>Works fully offline. Download the week's videos on Wi-Fi.</li>
+        </ul>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>A session must be completable with the phone face-down on the floor two metres away. Audio-first design is the difference between a workout app and a video player.</p>
+        </div>
+      </section>
+
+      <section id="s6">
+        <span class="num">Section 6</span>
+        <h2>Progress and photos</h2>
+        <div class="item keep">
+          <span class="tag">Keep</span>
+          <p>Progress photos are the most motivating feature in this category, because change shows up visually long before it shows up on the scale.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>A ghost overlay of the last photo so people stand in the same place, same light, same angle. Side-by-side comparison with a date slider. This turns photos from a dumping ground into the thing people open the app to see.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Photos stay on the device or in an encrypted store, locked behind the phone's biometric. Say so on the screen where they're taken. No cloud upload without explicit consent, no exceptions.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Show non-scale progress with equal weight: total sessions, minutes trained, reps completed, an exercise that got easier, a stretch that got deeper. For people whose weight stalls for three weeks — which is most people — this is what keeps them from quitting.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Waist and hip measurements, entered monthly. Cheap to build, more honest than weight, and strongly correlated with how people feel about their clothes.</p>
+        </div>
+      </section>
+
+      <section id="s7">
+        <span class="num">Section 7</span>
+        <h2>Food</h2>
+        <p class="lede">Nutrition is where your India advantage is largest and where the biggest emotional landmine sits.</p>
+
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Build the food database around real Indian home cooking — one katori dal, two rotis, a cup of poha, sabzi cooked in an unknown amount of oil, one idli, half a plate of biryani. Every global tracker mangles this, and it is a data moat a foreign competitor won't replicate. Portions in katori, chamach and roti counts, not grams.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>A "same as yesterday" button and saved meals. People eat roughly the same eight breakfasts. Photo logging is impressive in a demo; repeat-logging is what survives week three.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>Photo calorie estimation is now table stakes rather than a differentiator — MyFitnessPal acquired Cal AI in March 2026. It's also honestly inaccurate for mixed Indian dishes, where a photo can't see the oil. Use the photo to identify the dish and pre-fill the entry, then let the user confirm the portion. Don't claim a precision you don't have.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>Be very careful with "foods to avoid." Analysis of tens of thousands of posts about the largest fitness apps found calorie tracking and nagging notifications produced shame and disengagement, with users quitting the behaviour along with the app. Framing food as bad, or pushing notifications about unlogged meals, is the fastest way to make someone delete your app.</p>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <p>Frame it as addition rather than restriction: add protein, add a vegetable, swap the evening chai biscuit. One suggestion a day, never a scolding. Consider letting users hide the calorie number entirely and see only a simple traffic-light on protein and portions — a genuinely underserved mode.</p>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <p>If a user's inputs suggest disordered eating — very low targets, obsessive logging, rapid loss goals — the app should not comply cheerfully. Set a floor on calorie targets and cap the weight-loss rate you'll plan for.</p>
+        </div>
+      </section>
+
+      <section id="s8">
+        <span class="num">Section 8</span>
+        <h2>What your list doesn't have yet</h2>
+
+        <h3>A reason to come back tomorrow</h3>
+        <p>Every feature on your list is about the session. None of it is about the twenty-three hours in between. That gap is where the 80% churn happens.</p>
+        <ul class="plain">
+          <li>One notification a day, at a time the user picked, in the voice of a coach rather than a nag. Never guilt, never "you missed yesterday."</li>
+          <li>A comeback path. If someone disappears for ten days, the app should not open on a broken streak and a plan they're now behind on. It should say "welcome back, let's do an easy one" and quietly rebuild.</li>
+          <li>A weekly recap — what they did, what improved, what's next week. This is the single cheapest retention feature in the category.</li>
+        </ul>
+
+        <h3>Some form of accountability</h3>
+        <p>Training alone at home has no witness. A light social layer — train with a friend, see each other's week, nothing public and no leaderboards — addresses the actual reason home users quit. It's also the hardest thing for a bigger competitor to copy.</p>
+
+        <h3>Platform and data hygiene</h3>
+        <ul class="plain">
+          <li>Sync with Google Fit, Samsung Health and Apple Health. Android sync failures generate roughly twice the complaints iOS does, and getting it right is a real differentiator on the platform where most of your users will be.</li>
+          <li>Hindi first, then two or three more languages. English-only caps you at urban metros.</li>
+          <li>Export my data, and delete my account, both reachable in two taps.</li>
+        </ul>
+
+        <h3>Business model, decided now</h3>
+        <p>Health and fitness has the highest install-to-revenue of any app category, and free trials perform better here than almost anywhere — trial users on annual plans end up worth more than direct buyers, because fitness goals need time to prove out. Decide early: free plan with a paid personalisation tier, priced in rupees with UPI autopay, and a separate higher global price if you also ship to the US and UK.</p>
+
+        <h3>Accessibility and range</h3>
+        <p>Larger text, chair-based variations, and a genuine beginner tier for a 45-year-old who hasn't exercised in a decade. Most apps are built for people who are already fit. The people who need you most are not.</p>
+      </section>
+
+      <section id="s9">
+        <span class="num">Section 9</span>
+        <h2>Build order</h2>
+        <p class="lede">Everything above at once is a two-year project. Here's the cut.</p>
+
+        <div class="phase">
+          <h3>Version one</h3>
+          <p class="when">The smallest thing that can actually change someone's body</p>
+          <ul class="plain">
+            <li>Short onboarding — goal, place, equipment, pain, experience, time available</li>
+            <li>A generated week-one plan shown before any payment is mentioned</li>
+            <li>80–120 home exercises with clean demo videos, each with an easier and harder variation</li>
+            <li>Every session bookended with matched warm-up and cool-down</li>
+            <li>Session player: timer, rest, voice cues, offline, screen-off capable</li>
+            <li>"Too hard" and "too easy" buttons that change the next session</li>
+            <li>Progress photos with ghost overlay, weekly weigh-in, session count</li>
+            <li>Simple food log with Indian portions and saved meals</li>
+            <li>One daily notification, user-scheduled</li>
+          </ul>
+        </div>
+
+        <div class="phase">
+          <h3>Version two</h3>
+          <p class="when">Once people are finishing week four</p>
+          <ul class="plain">
+            <li>Camera form check on four exercises, on-device only</li>
+            <li>Photo food recognition, pre-filling rather than deciding</li>
+            <li>Health-platform sync, wearables, Hindi</li>
+            <li>Train-with-a-friend accountability</li>
+            <li>Weekly recap and structured multi-week programmes</li>
+          </ul>
+        </div>
+
+        <div class="phase">
+          <h3>Later</h3>
+          <p class="when">When home is working</p>
+          <ul class="plain">
+            <li>The gym mode you originally planned — machine-based plans, plate and weight logging, rest-day splits</li>
+            <li>Human coach layer, live sessions, gym partnerships</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="s10">
+        <span class="num">Section 10</span>
+        <h2>Open questions to settle before code</h2>
+        <ul class="plain">
+          <li>Who exactly is the first user — a 26-year-old in a Jaipur flat with two dumbbells, or a 40-year-old who has never trained? The plan generator, the tone and the video style all change with the answer.</li>
+          <li>Where do the exercise videos come from? Shot yourself, licensed, or animated? This is the longest lead-time item on the list.</li>
+          <li>Who writes the progression logic — a certified trainer, or the engineering team? If it's the latter, hire a trainer as a consultant before launch. This is the part users can tell is fake.</li>
+          <li>India-only or global from day one? It changes pricing, food database priority and language work.</li>
+          <li>What does "score" mean numerically, and can it go down?</li>
+        </ul>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="wrap" style="padding-left:0;padding-right:0">
+    <a class="toplink" href="#top">Back to top</a>
+    <p>Working plan, September 2026. Market and user-behaviour figures cited in the accompanying research. Nothing here is medical advice; a qualified trainer should review the exercise programming before launch.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section[id]'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.rail a[href^="#"], nav.jump a[href^="#"]'));
+  if(!sections.length || !links.length || !('IntersectionObserver' in window)) return;
+
+  function setActive(id){
+    links.forEach(function(a){
+      if(a.getAttribute('href') === '#' + id){
+        a.setAttribute('aria-current','true');
+        if(a.closest('.jump-inner')){
+          var bar = a.parentNode;
+          var left = a.offsetLeft - bar.clientWidth/2 + a.clientWidth/2;
+          bar.scrollTo({left: Math.max(0,left), behavior:'smooth'});
+        }
+      } else {
+        a.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  var visible = {};
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ visible[e.target.id] = e.isIntersecting; });
+    for(var i=0;i<sections.length;i++){
+      if(visible[sections[i].id]){ setActive(sections[i].id); break; }
+    }
+  }, {rootMargin: '-15% 0px -70% 0px', threshold: 0});
+
+  sections.forEach(function(s){ io.observe(s); });
+})();
+</script>
+
+</body>
+</html>
