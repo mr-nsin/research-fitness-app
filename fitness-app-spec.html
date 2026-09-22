@@ -49,14 +49,26 @@
 
   .wrap{max-width:1140px;margin:0 auto;padding:0 clamp(1.1rem,4vw,2.5rem)}
 
+  /* reading-progress bar */
+  .progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:40;background:transparent}
+  .progress-fill{height:100%;width:0%;background:var(--accent)}
+  @media (prefers-reduced-motion: no-preference){ .progress-fill{transition:width .12s linear} }
+
   /* hero */
   header.hero{padding:clamp(3rem,9vw,6rem) 0 2.5rem;border-bottom:1px solid var(--rule)}
-  .kicker{font-family:Archivo,sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.01em;color:var(--accent);margin:0 0 1.2rem}
+  .kicker-row{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin:0 0 1.2rem}
+  .kicker{font-family:Archivo,sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.01em;color:var(--accent);margin:0}
+  .namebadge{
+    font-family:Archivo,sans-serif;font-size:.74rem;font-weight:600;color:var(--ink-soft);
+    border:1px solid var(--rule);border-radius:999px;padding:.15rem .6rem .2rem;white-space:nowrap;
+  }
+  .namebadge b{color:var(--ink);font-weight:700}
   h1{
     font-size:clamp(2.1rem,6.4vw,4.1rem);line-height:1.04;font-weight:700;
     letter-spacing:-.025em;margin:0;max-width:17ch;
   }
   .sub{margin:1.4rem 0 0;max-width:60ch;color:var(--ink-soft);font-size:1.05rem}
+  .meta{margin:1.1rem 0 0;font-family:Archivo,sans-serif;font-size:.8rem;color:var(--ink-soft)}
 
   /* session strip */
   .strip{margin:2.8rem 0 0}
@@ -72,10 +84,11 @@
   .strip-note{margin:.75rem 0 0;font-size:.92rem;color:var(--ink-soft);max-width:62ch}
 
   /* layout */
-  .cols{display:grid;grid-template-columns:200px minmax(0,1fr);gap:clamp(2rem,5vw,4rem);padding:3rem 0 4rem}
-  nav.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 1.5rem);align-self:start;font-family:Archivo,sans-serif;font-size:.85rem}
+  .cols{display:grid;grid-template-columns:210px minmax(0,1fr);gap:clamp(2rem,5vw,4rem);padding:3rem 0 4rem}
+  nav.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 1.5rem);align-self:start;font-family:Archivo,sans-serif;font-size:.85rem;max-height:calc(100vh - 3rem);overflow-y:auto}
+  nav.rail p.railhead{margin:0 0 .8rem;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
   nav.rail ol{list-style:none;margin:0;padding:0}
-  nav.rail li{margin:0 0 .55rem}
+  nav.rail li{margin:0 0 .5rem}
   nav.rail a{color:var(--ink-soft);text-decoration:none;display:block;padding:.15rem 0}
   nav.rail a:hover,nav.rail a:focus-visible{color:var(--accent)}
   nav.rail a[aria-current="true"]{color:var(--ink);font-weight:600;box-shadow:inset 2px 0 0 var(--accent);padding-left:.6rem}
@@ -83,9 +96,8 @@
 
   /* sticky section bar for narrow screens */
   .jump{
-    display:none;position:sticky;top:0;z-index:20;
+    display:none;position:sticky;top:3px;z-index:20;
     background:var(--paper);border-bottom:1px solid var(--rule);
-    padding-top:env(safe-area-inset-top,0px);
   }
   .jump-inner{display:flex;gap:.4rem;overflow-x:auto;padding:.55rem clamp(1.1rem,4vw,2.5rem);-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .jump-inner::-webkit-scrollbar{display:none}
@@ -95,12 +107,15 @@
     border:1px solid var(--rule);border-radius:999px;padding:.32rem .7rem;white-space:nowrap;
   }
   .jump a[aria-current="true"]{color:var(--paper);background:var(--accent);border-color:var(--accent)}
-  @media (max-width:860px){ .jump{display:block} html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 3.6rem)} }
+  @media (max-width:860px){ .jump{display:block} html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 3.9rem)} }
 
   .toplink{display:inline-block;margin:0 0 2rem;font-family:Archivo,sans-serif;font-size:.85rem;text-decoration:none}
   .toplink:hover{text-decoration:underline}
 
-  section{padding:0 0 3.4rem;max-width:74ch}
+  section{padding:0 0 3.6rem;max-width:74ch;border-top:1px solid var(--rule)}
+  section:first-of-type{border-top:0}
+  section{padding-top:3rem}
+  section:first-of-type{padding-top:0}
   .num{
     font-family:Archivo,sans-serif;font-size:.8rem;font-weight:600;color:var(--accent);
     display:block;margin:0 0 .35rem
@@ -111,26 +126,51 @@
   .lede{color:var(--ink-soft)}
 
   /* annotated items */
-  .item{border-left:3px solid var(--rule);padding:.15rem 0 .15rem 1rem;margin:0 0 1.15rem}
-  .item.keep{border-color:var(--keep)}
-  .item.add{border-color:var(--add)}
-  .item.watch{border-color:var(--watch)}
-  .tag{font-family:Archivo,sans-serif;font-size:.74rem;font-weight:600;display:block;margin:0 0 .15rem}
+  .item{
+    border:1px solid var(--rule);border-left:3px solid var(--rule);border-radius:7px;
+    padding:.95rem 1.1rem;margin:0 0 1rem;background:var(--surface);
+    box-shadow:0 1px 2px rgba(0,0,0,.03);transition:box-shadow .15s ease, transform .15s ease;
+  }
+  .item:hover{box-shadow:0 3px 10px rgba(0,0,0,.07);transform:translateY(-1px)}
+  @media (prefers-reduced-motion: reduce){ .item{transition:none} .item:hover{transform:none} }
+  .item.keep{border-left-color:var(--keep);background:color-mix(in srgb, var(--keep) 7%, var(--surface))}
+  .item.add{border-left-color:var(--add);background:color-mix(in srgb, var(--add) 6%, var(--surface))}
+  .item.watch{border-left-color:var(--watch);background:color-mix(in srgb, var(--watch) 7%, var(--surface))}
+  .tag{
+    font-family:Archivo,sans-serif;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+    display:inline-flex;align-items:center;gap:.35rem;margin:0 0 .5rem;padding:.14rem .55rem;border-radius:999px;border:1px solid currentColor;
+  }
+  .tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex:0 0 auto}
   .keep .tag{color:var(--keep)}
   .add .tag{color:var(--add)}
   .watch .tag{color:var(--watch)}
   .item p{margin:0;font-size:.98rem}
+  .item p + p{margin-top:.6rem}
+  .item ul{margin:0;padding:0 0 0 1.05rem}
+  .item ul li{font-size:.98rem;margin:0 0 .4rem}
+  .item ul li:last-child{margin-bottom:0}
+  .item ul li::marker{color:var(--ink-soft)}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:1.1rem;margin:1.4rem 0 0;font-family:Archivo,sans-serif;font-size:.78rem;color:var(--ink-soft)}
+  .legend span{display:inline-flex;align-items:center;gap:.4rem}
+  .legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .legend .k-keep i{background:var(--keep)}
+  .legend .k-add i{background:var(--add)}
+  .legend .k-watch i{background:var(--watch)}
 
   ul.plain{margin:0 0 1.2rem;padding:0 0 0 1.1rem}
   ul.plain li{margin:0 0 .45rem}
 
-  /* question table */
-  .qs{width:100%;border-collapse:collapse;font-size:.94rem;margin:0 0 1.3rem;display:block;overflow-x:auto}
+  /* question / data tables */
+  .qs{width:100%;border-collapse:collapse;font-size:.94rem;margin:0 0 1.3rem;display:block;overflow-x:auto;border:1px solid var(--rule);border-radius:6px}
   .qs table{width:100%;border-collapse:collapse;min-width:460px}
-  .qs th,.qs td{text-align:left;padding:.55rem .8rem .55rem 0;border-bottom:1px solid var(--rule);vertical-align:top}
-  .qs th{font-family:Archivo,sans-serif;font-size:.78rem;font-weight:600;color:var(--ink-soft)}
+  .qs th,.qs td{text-align:left;padding:.6rem .9rem;border-bottom:1px solid var(--rule);vertical-align:top}
+  .qs tr:last-child td{border-bottom:0}
+  .qs th{font-family:Archivo,sans-serif;font-size:.76rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);background:var(--shell)}
+  .qs td.num,.qs th.num{text-align:right;font-variant-numeric:tabular-nums}
 
-  .callout{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:1.1rem 1.2rem;margin:0 0 1.3rem}
+  .callout{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--ink);border-radius:6px;padding:1.15rem 1.25rem;margin:0 0 1.3rem}
   .callout p:last-child{margin:0}
   .callout strong{font-family:Archivo,sans-serif;font-size:.95rem}
 
@@ -139,12 +179,36 @@
   .phase h3{margin:0 0 .3rem;font-size:1.1rem}
   .phase .when{font-family:Archivo,sans-serif;font-size:.78rem;color:var(--ink-soft);margin:0 0 .7rem}
 
+  .sources{font-size:.88rem;color:var(--ink-soft);padding:0 0 0 1.1rem;margin:0}
+  .sources li{margin:0 0 .4rem}
+  .sources a{word-break:break-word}
+
   footer{border-top:1px solid var(--rule);padding:2rem 0 3.5rem;font-size:.92rem;color:var(--ink-soft)}
   a{color:var(--accent)}
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  /* theme toggle */
+  .theme-toggle{
+    position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;z-index:35;
+    width:38px;height:38px;border-radius:50%;border:1px solid var(--rule);background:var(--surface);
+    color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+  }
+  .theme-toggle:hover{border-color:var(--accent)}
+  .theme-toggle svg{width:17px;height:17px}
+  .theme-toggle .i-moon{display:none}
+  :root[data-theme="dark"] .theme-toggle .i-sun{display:none}
+  :root[data-theme="dark"] .theme-toggle .i-moon{display:block}
 </style>
 </head>
 <body>
+
+<button class="theme-toggle ui" id="themeToggle" type="button" aria-label="Toggle dark mode">
+  <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+</button>
+
+<div class="progress" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
 
 <nav class="jump" aria-label="Jump to section">
   <div class="jump-inner">
@@ -152,21 +216,31 @@
     <a href="#s1">1 Onboarding</a>
     <a href="#s2">2 Home screen</a>
     <a href="#s3">3 Plan &amp; stretching</a>
-    <a href="#s4">4 Form camera</a>
-    <a href="#s5">5 Timer</a>
-    <a href="#s6">6 Progress</a>
-    <a href="#s7">7 Food</a>
-    <a href="#s8">8 What's missing</a>
-    <a href="#s9">9 Build order</a>
-    <a href="#s10">10 Open questions</a>
+    <a href="#s4">4 HIIT &amp; calisthenics</a>
+    <a href="#s5">5 Form camera</a>
+    <a href="#s6">6 Camera privacy</a>
+    <a href="#s7">7 Timer</a>
+    <a href="#s8">8 Progress</a>
+    <a href="#s9">9 Avatar</a>
+    <a href="#s10">10 Activity tracking</a>
+    <a href="#s11">11 Food</a>
+    <a href="#s12">12 AI cost</a>
+    <a href="#s13">13 Social sharing</a>
+    <a href="#s14">14 What's missing</a>
+    <a href="#s15">15 Build order</a>
+    <a href="#s16">16 Open questions</a>
   </div>
 </nav>
 
 <div class="wrap" id="top">
   <header class="hero">
-    <p class="kicker">Product plan — home users first, gym users second</p>
+    <div class="kicker-row">
+      <p class="kicker">Product plan — home users first, gym users second</p>
+      <span class="namebadge">Working name: <b>CasaFit</b></span>
+    </div>
     <h1>A training app that warms you up and cools you down every single time.</h1>
-    <p class="sub">Your seven points, tightened into a build order, plus the pieces that are missing and the two features most likely to sink the timeline if they go into version one.</p>
+    <p class="sub">Your points, tightened into a build order, plus the pieces that are missing and the features most likely to sink the timeline if they go into version one.</p>
+    <p class="meta">Working plan · revised September 2026 · 16 sections</p>
 
     <div class="strip">
       <p class="strip-label">The session shape — your actual differentiator</p>
@@ -177,21 +251,34 @@
       </div>
       <p class="strip-note">No other mainstream app bookends every session automatically. Make this the thing people describe when they recommend you, not a checkbox in a feature list.</p>
     </div>
+
+    <p class="legend" aria-label="How items in this document are marked">
+      <span class="k-keep"><i></i>Keep — already right, don't touch it</span>
+      <span class="k-add"><i></i>Add — a gap worth closing</span>
+      <span class="k-watch"><i></i>Watch — a real risk if built carelessly</span>
+    </p>
   </header>
 
   <div class="cols">
     <nav class="rail" aria-label="Sections">
+      <p class="railhead">Contents</p>
       <ol>
         <li><a href="#s1">1 · Onboarding</a></li>
         <li><a href="#s2">2 · Home screen</a></li>
         <li><a href="#s3">3 · Plan &amp; stretching</a></li>
-        <li><a href="#s4">4 · Form camera</a></li>
-        <li><a href="#s5">5 · Timer</a></li>
-        <li><a href="#s6">6 · Progress</a></li>
-        <li><a href="#s7">7 · Food</a></li>
-        <li><a href="#s8">8 · What's missing</a></li>
-        <li><a href="#s9">9 · Build order</a></li>
-        <li><a href="#s10">10 · Open questions</a></li>
+        <li><a href="#s4">4 · HIIT &amp; calisthenics</a></li>
+        <li><a href="#s5">5 · Form camera</a></li>
+        <li><a href="#s6">6 · Camera privacy &amp; PII</a></li>
+        <li><a href="#s7">7 · Timer</a></li>
+        <li><a href="#s8">8 · Progress &amp; photos</a></li>
+        <li><a href="#s9">9 · Avatar from photos</a></li>
+        <li><a href="#s10">10 · Activity tracking</a></li>
+        <li><a href="#s11">11 · Food</a></li>
+        <li><a href="#s12">12 · AI cost economics</a></li>
+        <li><a href="#s13">13 · Social sharing</a></li>
+        <li><a href="#s14">14 · What's missing</a></li>
+        <li><a href="#s15">15 · Build order</a></li>
+        <li><a href="#s16">16 · Open questions</a></li>
       </ol>
     </nav>
 
@@ -217,31 +304,38 @@
 
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Time available per session, and days per week. Everything downstream depends on it, and almost nobody asks it properly. A person with 20 minutes needs a different plan, not a shortened one.</p>
+          <ul><li>Time available per session, and days per week. Everything downstream depends on it, and almost nobody asks it properly. A person with 20 minutes needs a different plan, not a shortened one.</li></ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Equipment as a picture grid, not a text list — dumbbells, resistance band, mat, chair, wall, pull-up bar, kettlebell, bench, nothing at all. "Nothing at all" must produce a real plan, because that is a large share of home users.</p>
+          <ul><li>Equipment as a picture grid, not a text list — dumbbells, resistance band, mat, chair, wall, pull-up bar, kettlebell, bench, nothing at all. "Nothing at all" must produce a real plan, because that is a large share of home users.</li></ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Space and noise. A first-floor flat with neighbours below rules out jumping jacks and burpees. One tap, big payoff in trust.</p>
+          <ul><li>Space and noise. A first-floor flat with neighbours below rules out jumping jacks and burpees. One tap, big payoff in trust.</li></ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Two or three health flags: pregnancy or postpartum, high blood pressure or heart condition, recent surgery. Route these to a gentler plan and show a short line recommending a doctor's clearance.</p>
+          <ul>
+            <li>Two or three health flags: pregnancy or postpartum, high blood pressure or heart condition, recent surgery.</li>
+            <li>Route these to a gentler plan and show a short line recommending a doctor's clearance.</li>
+          </ul>
         </div>
         <div class="item watch">
           <span class="tag">Watch</span>
-          <p>Pain areas need a follow-up, not just a body map. "Knee" could mean old ACL surgery or soreness from yesterday. Ask one question: is this an injury you've been treated for, or general discomfort? Then hard-exclude contraindicated movements and log why, so the user sees "skipping lunges because of your knee" rather than silently missing exercises.</p>
+          <ul>
+            <li>Pain areas need a follow-up, not just a body map. "Knee" could mean old ACL surgery or soreness from yesterday.</li>
+            <li>Ask one question: is this an injury you've been treated for, or general discomfort?</li>
+            <li>Then hard-exclude contraindicated movements and log why, so the user sees "skipping lunges because of your knee" rather than silently missing exercises.</li>
+          </ul>
         </div>
         <div class="item watch">
           <span class="tag">Watch</span>
-          <p>Showing ratings and "why we're better than others" inside onboarding reads as a sales pitch at the exact moment the user wants to start. Put the social proof on the app-store page and the paywall instead.</p>
+          <ul><li>Showing ratings and "why we're better than others" inside onboarding reads as a sales pitch at the exact moment the user wants to start. Put the social proof on the app-store page and the paywall instead.</li></ul>
         </div>
         <div class="item watch">
           <span class="tag">Watch</span>
-          <p>The 30/60/90-day body-change preview is standard, and effective, but only promise what you can defend. A vague silhouette plus a realistic weight range beats a dramatic before-after, which invites refund requests and app-store complaints.</p>
+          <ul><li>The 30/60/90-day body-change preview is standard, and effective, but only promise what you can defend. A vague silhouette plus a realistic weight range beats a dramatic before-after, which invites refund requests and app-store complaints.</li></ul>
         </div>
 
         <div class="callout">
@@ -267,15 +361,19 @@
 
         <div class="item add">
           <span class="tag">Add</span>
-          <p>A rest day is a designed screen, not an empty one. Show a mobility or walk suggestion and why rest matters. Empty screens on rest days teach people the app has nothing for them today, and that's how the habit breaks.</p>
+          <ul><li>A rest day is a designed screen, not an empty one. Show a mobility or walk suggestion and why rest matters. Empty screens on rest days teach people the app has nothing for them today, and that's how the habit breaks.</li></ul>
         </div>
         <div class="item watch">
           <span class="tag">Watch</span>
-          <p>Daily weight on the home screen backfires for a lot of users. Weight fluctuates 1–2 kg a day on water alone, and research into the top fitness apps found that rigid numeric feedback produced shame, demotivation, and people quitting the app and the exercise together. Default to weekly weigh-ins and show a trend line, never a single day's number.</p>
+          <ul>
+            <li>Daily weight on the home screen backfires for a lot of users. Weight fluctuates 1–2 kg a day on water alone.</li>
+            <li>Research into the top fitness apps found that rigid numeric feedback produced shame, demotivation, and people quitting the app and the exercise together.</li>
+            <li>Default to weekly weigh-ins and show a trend line, never a single day's number.</li>
+          </ul>
         </div>
         <div class="item watch">
           <span class="tag">Watch</span>
-          <p>"Scores" need a definition before you build them. If a score can drop, you've built a punishment system. Consider making it only additive — effort earns points, missing a day earns zero, nothing is ever taken away.</p>
+          <ul><li>"Scores" need a definition before you build them. If a score can drop, you've built a punishment system. Consider making it only additive — effort earns points, missing a day earns zero, nothing is ever taken away.</li></ul>
         </div>
       </section>
 
@@ -287,32 +385,91 @@
 
         <div class="item keep">
           <span class="tag">Keep</span>
-          <p>Warm-up and cool-down included by default in every session, including single-body-part sessions.</p>
+          <ul><li>Warm-up and cool-down included by default in every session, including single-body-part sessions.</li></ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Get the physiology right or the claim collapses. Warm-ups should be dynamic — leg swings, arm circles, light versions of the movement to come. Cool-downs should be static holds of 20–30 seconds on the muscles just worked. Static stretching before lifting temporarily reduces strength, so don't put it at the front.</p>
+          <ul>
+            <li>Get the physiology right or the claim collapses. Warm-ups should be dynamic — leg swings, arm circles, light versions of the movement to come.</li>
+            <li>Cool-downs should be static holds of 20–30 seconds on the muscles just worked.</li>
+            <li>Static stretching before lifting temporarily reduces strength, so don't put it at the front.</li>
+          </ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Let users skip the warm-up, but make it one deliberate tap and track how often it happens. If most people skip it, your stretches are too long or too boring, and you need to know that early.</p>
+          <ul>
+            <li>Let users skip the warm-up, but make it one deliberate tap and track how often it happens.</li>
+            <li>If most people skip it, your stretches are too long or too boring, and you need to know that early.</li>
+          </ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Progression rules. A plan that gives the same workout in week six as week one is the most common complaint against AI workout apps. Define the rule now: add reps, then sets, then load, then harder variation. Ask after each session "how hard was that?" on a three-point scale, and let that answer drive next week.</p>
+          <ul>
+            <li>Progression rules. A plan that gives the same workout in week six as week one is the most common complaint against AI workout apps.</li>
+            <li>Define the rule now: add reps, then sets, then load, then harder variation.</li>
+            <li>Ask after each session "how hard was that?" on a three-point scale, and let that answer drive next week.</li>
+          </ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Substitution. Every exercise needs an easier version, a harder version, and a no-equipment version. This single system covers injuries, missing equipment, bad days, and progression at once — build it as one mechanism rather than four.</p>
+          <ul>
+            <li>Substitution. Every exercise needs an easier version, a harder version, and a no-equipment version.</li>
+            <li>This single system covers injuries, missing equipment, bad days, and progression at once — build it as one mechanism rather than four.</li>
+            <li>It's also the same mechanism that carries the HIIT and calisthenics ladders in <a href="#s4">§4</a>.</li>
+          </ul>
         </div>
         <div class="item watch">
           <span class="tag">Watch</span>
-          <p>Content is the real cost here. A credible home library needs roughly 120–180 exercises, each with a clean demo, muscle tags, difficulty tier, equipment tag, and two substitutions. Budget for that before you budget for AI.</p>
+          <ul><li>Content is the real cost here. A credible home library needs roughly 120–180 exercises, each with a clean demo, muscle tags, difficulty tier, equipment tag, and two substitutions. Budget for that before you budget for AI.</li></ul>
         </div>
       </section>
 
       <section id="s4">
         <span class="num">Section 4</span>
+        <h2>HIIT and calisthenics</h2>
+        <p class="lede">Bodyweight-only training is exactly what the "nothing at all" equipment path from onboarding needs, and it doubles as the hardest tier of the substitution ladder in §3. Research a good approach.</p>
+
+        <div class="item keep">
+          <span class="tag">Keep</span>
+          <ul>
+            <li>Calisthenics is genuinely beginner-appropriate when progressed properly — research on bodyweight training shows it builds real strength, muscle endurance, joint stability and core control for beginners and intermediates alike, provided technique comes before load.</li>
+            <li>Squats, push-ups, planks and lunges are already core to a home library, so this isn't a new content category — it's a training style layered on exercises you're already building.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Build calisthenics as progressions, not one-off moves: wall push-up → knee push-up → full push-up → decline push-up, and the equivalent ladder for squats, rows and planks.</li>
+            <li>Reuse the substitution system from §3 rather than standing up a second content pipeline.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Offer HIIT circuits — bodyweight squats, mountain climbers, high knees — as a selectable session <em>style</em>, not a separate product.</li>
+            <li>The timer, rest, and voice-cue infrastructure in §7 already does the work; HIIT is just a shorter work-to-rest ratio applied to exercises already in the library.</li>
+            <li>It's a well-evidenced format for cardio and fat-loss outcomes, including in home settings without equipment.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Home HIIT carries real injury exposure: poor form under fatigue, and cramped rooms with no space to move safely.</li>
+            <li>Respect the space-and-noise flag from §1 — no jumping or plyometric moves for flagged flats.</li>
+            <li>Cap HIIT to twice a week for beginners at first, and gate high-impact variations behind the experience-level answer from onboarding rather than offering them to everyone by default.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Bare floors and cheap or missing equipment raise wrist, elbow and shoulder risk in calisthenics specifically.</li>
+            <li>Recommend a mat in the equipment picker, and fold a "neutral wrist, soft elbows" cue into the warm-up voice line for any hands-on-floor movement.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="s5">
+        <span class="num">Section 5</span>
         <h2>The camera form-checker</h2>
         <p class="lede">The most exciting feature on your list, and the one most likely to delay launch by six months. Plan it as version two.</p>
 
@@ -323,24 +480,73 @@
 
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Ship a cheaper version of the same promise first. Text and audio form cues at the start of each set — "chest up, knees tracking over toes, don't let them cave in" — plus a mirror-check prompt. Most beginner form errors are the same five mistakes per exercise, and a coach's voice catches most of them without any computer vision.</p>
+          <ul><li>Ship a cheaper version of the same promise first. Text and audio form cues at the start of each set — "chest up, knees tracking over toes, don't let them cave in" — plus a mirror-check prompt. Most beginner form errors are the same five mistakes per exercise, and a coach's voice catches most of them without any computer vision.</li></ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>When you do build it, start with three or four exercises only — squat, push-up, plank, lunge. Depth and knee position on a bodyweight squat are tractable. A deadlift is not.</p>
+          <ul><li>When you do build it, start with three or four exercises only — squat, push-up, plank, lunge. Depth and knee position on a bodyweight squat are tractable. A deadlift is not.</li></ul>
         </div>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>Say clearly and repeatedly that video never leaves the phone. Camera plus body plus a stranger's server is the fastest way to lose Indian users, women especially. Process on-device, store nothing, and make that a headline, not a privacy-policy line.</p>
+          <ul><li>Say clearly and repeatedly that video never leaves the phone. Camera plus body plus a stranger's server is the fastest way to lose Indian users, women especially. Process on-device, store nothing, and make that a headline, not a privacy-policy line. §6 spells out why this isn't optional once the fatigue-detection idea is on the table too.</li></ul>
         </div>
         <div class="item keep">
           <span class="tag">Keep</span>
-          <p>The fatigue-and-adapt idea is excellent and needs no camera. Just ask. A "too hard" button on the timer screen that instantly cuts the set short, extends rest, or drops to an easier variation — and then changes tomorrow's session — delivers most of the value at a fraction of the cost.</p>
+          <ul><li>The fatigue-and-adapt idea is excellent and needs no camera. Just ask. A "too hard" button on the timer screen that instantly cuts the set short, extends rest, or drops to an easier variation — and then changes tomorrow's session — delivers most of the value at a fraction of the cost, and none of the privacy exposure in §6.</li></ul>
         </div>
       </section>
 
-      <section id="s5">
-        <span class="num">Section 5</span>
+      <section id="s6">
+        <span class="num">Section 6</span>
+        <h2>Camera privacy, PII and consent</h2>
+        <p class="lede">You raised a specific version of the camera idea: keep the camera open during a set, detect when someone looks fatigued, and automatically drop the next exercise's intensity — with each frame sent to an AI model for a suggestion. That crosses from "nice feature" into regulated biometric processing, in both the EU and India, and it's worth designing around before it's built, not after.</p>
+
+        <div class="callout">
+          <p><strong>Why streaming frames to a server is expensive, not just risky</strong></p>
+          <p>Under GDPR, data used to analyse someone's body or face for a health-adjacent inference is <strong>special category data</strong> under Article 9 — it needs explicit, standalone consent and typically a Data Protection Impact Assessment, and can't be bundled into a general terms-of-service acceptance. Under India's DPDP Act 2023, biometric data needs specific, standalone, verifiable consent — not bundled — collected only for a "compelling legitimate purpose," with data minimisation (store derived signals, not raw frames) and strict retention limits. Penalties for mishandling run up to ₹250 crore (roughly $30M).</p>
+        </div>
+
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Sending every frame to a server means continuously capturing — and, even if briefly, transmitting and processing — a live video stream of someone's body, usually in a bedroom or living room, sometimes in exercise clothing.</li>
+            <li>That's the fastest way to lose trust and invite a DPDP or GDPR enforcement action, independent of intent, and it's the same trust risk already flagged for the form-checker in §5.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Do fatigue detection entirely on-device: run pose-landmark extraction locally, read rep tempo and joint-angle drift from that, and discard each frame immediately after the signal is extracted.</li>
+            <li>Only the derived signal — "rep tempo slowed 40%, form drifting" — should ever reach your servers, never the video itself.</li>
+            <li>This is the same approach the better body-avatar apps already use (§9): scan the signal, not the image.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>If any part of this genuinely needs server-side processing later, treat it as regulated biometric processing from day one.</li>
+            <li>A standalone opt-in (never bundled into signup), a plain-language line on what's captured and why, and a visible on/off toggle right on the session-player screen.</li>
+            <li>Immediate deletion of any frame after inference — no raw-video retention, ever.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Make the intensity adjustment visible and explainable: "we slowed your next set down because your form drifted."</li>
+            <li>That's both a trust feature and, if a user or a regulator ever asks why the app changed their programme, your defensibility.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>The liability doesn't stop at privacy. Auto-lowering intensity from a webcam's read of "fatigue" is a health-adjacent inference that will sometimes be wrong — bad lighting, an odd camera angle, loose clothing, the same failure modes already called out in §5.</li>
+            <li>Keep a manual override always visible ("I'm fine, continue") and never silently downgrade a session without telling the user why.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="s7">
+        <span class="num">Section 7</span>
         <h2>Timer and session player</h2>
         <p class="lede">Unglamorous, and the screen people spend all their time on. Get it right and a lot of complaints never happen.</p>
         <ul class="plain">
@@ -353,68 +559,246 @@
         </ul>
         <div class="item add">
           <span class="tag">Add</span>
-          <p>A session must be completable with the phone face-down on the floor two metres away. Audio-first design is the difference between a workout app and a video player.</p>
-        </div>
-      </section>
-
-      <section id="s6">
-        <span class="num">Section 6</span>
-        <h2>Progress and photos</h2>
-        <div class="item keep">
-          <span class="tag">Keep</span>
-          <p>Progress photos are the most motivating feature in this category, because change shows up visually long before it shows up on the scale.</p>
-        </div>
-        <div class="item add">
-          <span class="tag">Add</span>
-          <p>A ghost overlay of the last photo so people stand in the same place, same light, same angle. Side-by-side comparison with a date slider. This turns photos from a dumping ground into the thing people open the app to see.</p>
-        </div>
-        <div class="item add">
-          <span class="tag">Add</span>
-          <p>Photos stay on the device or in an encrypted store, locked behind the phone's biometric. Say so on the screen where they're taken. No cloud upload without explicit consent, no exceptions.</p>
-        </div>
-        <div class="item add">
-          <span class="tag">Add</span>
-          <p>Show non-scale progress with equal weight: total sessions, minutes trained, reps completed, an exercise that got easier, a stretch that got deeper. For people whose weight stalls for three weeks — which is most people — this is what keeps them from quitting.</p>
-        </div>
-        <div class="item add">
-          <span class="tag">Add</span>
-          <p>Waist and hip measurements, entered monthly. Cheap to build, more honest than weight, and strongly correlated with how people feel about their clothes.</p>
-        </div>
-      </section>
-
-      <section id="s7">
-        <span class="num">Section 7</span>
-        <h2>Food</h2>
-        <p class="lede">Nutrition is where your India advantage is largest and where the biggest emotional landmine sits.</p>
-
-        <div class="item add">
-          <span class="tag">Add</span>
-          <p>Build the food database around real Indian home cooking — one katori dal, two rotis, a cup of poha, sabzi cooked in an unknown amount of oil, one idli, half a plate of biryani. Every global tracker mangles this, and it is a data moat a foreign competitor won't replicate. Portions in katori, chamach and roti counts, not grams.</p>
-        </div>
-        <div class="item add">
-          <span class="tag">Add</span>
-          <p>A "same as yesterday" button and saved meals. People eat roughly the same eight breakfasts. Photo logging is impressive in a demo; repeat-logging is what survives week three.</p>
-        </div>
-        <div class="item watch">
-          <span class="tag">Watch</span>
-          <p>Photo calorie estimation is now table stakes rather than a differentiator — MyFitnessPal acquired Cal AI in March 2026. It's also honestly inaccurate for mixed Indian dishes, where a photo can't see the oil. Use the photo to identify the dish and pre-fill the entry, then let the user confirm the portion. Don't claim a precision you don't have.</p>
-        </div>
-        <div class="item watch">
-          <span class="tag">Watch</span>
-          <p>Be very careful with "foods to avoid." Analysis of tens of thousands of posts about the largest fitness apps found calorie tracking and nagging notifications produced shame and disengagement, with users quitting the behaviour along with the app. Framing food as bad, or pushing notifications about unlogged meals, is the fastest way to make someone delete your app.</p>
-        </div>
-        <div class="item add">
-          <span class="tag">Add</span>
-          <p>Frame it as addition rather than restriction: add protein, add a vegetable, swap the evening chai biscuit. One suggestion a day, never a scolding. Consider letting users hide the calorie number entirely and see only a simple traffic-light on protein and portions — a genuinely underserved mode.</p>
-        </div>
-        <div class="item watch">
-          <span class="tag">Watch</span>
-          <p>If a user's inputs suggest disordered eating — very low targets, obsessive logging, rapid loss goals — the app should not comply cheerfully. Set a floor on calorie targets and cap the weight-loss rate you'll plan for.</p>
+          <ul><li>A session must be completable with the phone face-down on the floor two metres away. Audio-first design is the difference between a workout app and a video player — and it's also, incidentally, the honest answer to the camera-fatigue idea in §6: a phone face-down can't see you at all.</li></ul>
         </div>
       </section>
 
       <section id="s8">
         <span class="num">Section 8</span>
+        <h2>Progress and photos</h2>
+        <div class="item keep">
+          <span class="tag">Keep</span>
+          <ul><li>Progress photos are the most motivating feature in this category, because change shows up visually long before it shows up on the scale.</li></ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul><li>A ghost overlay of the last photo so people stand in the same place, same light, same angle. Side-by-side comparison with a date slider. This turns photos from a dumping ground into the thing people open the app to see.</li></ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul><li>Photos stay on the device or in an encrypted store, locked behind the phone's biometric. Say so on the screen where they're taken. No cloud upload without explicit consent, no exceptions.</li></ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul><li>Show non-scale progress with equal weight: total sessions, minutes trained, reps completed, an exercise that got easier, a stretch that got deeper. For people whose weight stalls for three weeks — which is most people — this is what keeps them from quitting.</li></ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul><li>Waist and hip measurements, entered monthly. Cheap to build, more honest than weight, and strongly correlated with how people feel about their clothes.</li></ul>
+        </div>
+      </section>
+
+      <section id="s9">
+        <span class="num">Section 9</span>
+        <h2>Avatar creation from photos</h2>
+        <p class="lede">A photo-based avatar is a better daily touchpoint than a raw photo — people won't take a progress photo every day, but a silhouette that updates weekly can live on the home screen without the emotional weight of a mirror photo.</p>
+
+        <div class="item keep">
+          <span class="tag">Keep</span>
+          <ul>
+            <li>The category is proven: current 3D-body-scan apps generate a usable avatar from as few as two photos (front and side).</li>
+            <li>The better ones treat the photo purely as an input to extract measurements, not as content to store or show back.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Build it the privacy-first way the strongest competitors already do: generate the silhouette and measurements on-device, keep only the derived shape data, and never upload the source photos.</li>
+            <li>The best framing, borrowed directly from that category: the app scans the silhouette, not the image.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul><li>Two photos — front and side — is enough for a usable avatar. Don't ask for more than that at setup, or this quietly becomes exactly the onboarding-length problem flagged in §1.</li></ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>An avatar rendering someone's changing body shape is arguably more sensitive than the photo it's built from — it's a direct visualisation of a health and body attribute.</li>
+            <li>Apply the same consent, on-device-only and biometric-handling rules from §6 here, not a lighter version of them.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Don't let the avatar become another shame mechanic. No "goal body" overlay pulled from someone else's photo.</li>
+            <li>No default-on sharing of the avatar or its comparisons — see the sharing risk in §13.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="s10">
+        <span class="num">Section 10</span>
+        <h2>Activity tracking, Strava-style</h2>
+        <p class="lede">This app is session-based — home workouts — but users still run, walk and cycle on the days they're not doing a session. A lightweight activity log covers that gap and gives the streak in §2 something to count on off-days, rather than treating a run as invisible to the app.</p>
+
+        <div class="item keep">
+          <span class="tag">Keep</span>
+          <ul><li>GPS logging of runs, walks and rides on non-session days, feeding straight into the same "sessions completed" number and streak strip from §2. A rest-day walk should count, not silently vanish.</li></ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Borrow the two mechanics that actually drive Strava's engagement, not the whole social network.</li>
+            <li>Private personal-best tracking on a route or distance — your fastest 1 km, visible only to you.</li>
+            <li>A lightweight, friend-circle-only reaction, reusing the "train with a friend" idea already planned in §14, rather than a public feed.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Strava's global heatmap — an aggregate of GPS routes across all users — is one of the most cited privacy failures in fitness tech, having reportedly exposed the layout and routines of military bases and individuals through public route data.</li>
+            <li>Default every route to private, require an explicit per-activity opt-in to share a specific route rather than a single global toggle, and don't build a public aggregate heatmap of any kind.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Research on fitness-app social features consistently finds users prefer private self-comparison over public competition and exhibitionism, and actively avoid apps that push them toward it.</li>
+            <li>Keep leaderboards and public segments off by default — this is the same "no leaderboards" principle already set for the social layer in §14, applied here too.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Route and activity data should feed into the Health-platform sync work already planned in §14 (Google Fit, Apple Health, Samsung Health) rather than becoming a second, parallel data pipeline.</li>
+            <li>Treat Strava-style tracking as a new data type inside the existing sync system, not a new subsystem.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="s11">
+        <span class="num">Section 11</span>
+        <h2>Food</h2>
+        <p class="lede">Nutrition is where your India advantage is largest and where the biggest emotional landmine sits.</p>
+
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Build the food database around real Indian home cooking — one katori dal, two rotis, a cup of poha, sabzi cooked in an unknown amount of oil, one idli, half a plate of biryani.</li>
+            <li>Every global tracker mangles this, and it is a data moat a foreign competitor won't replicate. Portions in katori, chamach and roti counts, not grams.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>A "same as yesterday" button and saved meals. People eat roughly the same eight breakfasts.</li>
+            <li>Photo logging is impressive in a demo; repeat-logging is what survives week three.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Photo calorie estimation is now table stakes rather than a differentiator — MyFitnessPal acquired Cal AI in March 2026.</li>
+            <li>It's also honestly inaccurate for mixed Indian dishes, where a photo can't see the oil. Use the photo to identify the dish and pre-fill the entry, then let the user confirm the portion.</li>
+            <li>Don't claim a precision you don't have — §12 covers what confirm-and-correct also does for your cost per user.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Be very careful with "foods to avoid." Analysis of tens of thousands of posts about the largest fitness apps found calorie tracking and nagging notifications produced shame and disengagement, with users quitting the behaviour along with the app.</li>
+            <li>Framing food as bad, or pushing notifications about unlogged meals, is the fastest way to make someone delete your app.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Frame it as addition rather than restriction: add protein, add a vegetable, swap the evening chai biscuit. One suggestion a day, never a scolding.</li>
+            <li>Consider letting users hide the calorie number entirely and see only a simple traffic-light on protein and portions — a genuinely underserved mode.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul><li>If a user's inputs suggest disordered eating — very low targets, obsessive logging, rapid loss goals — the app should not comply cheerfully. Set a floor on calorie targets and cap the weight-loss rate you'll plan for.</li></ul>
+        </div>
+      </section>
+
+      <section id="s12">
+        <span class="num">Section 12</span>
+        <h2>AI cost economics for food tracking</h2>
+        <p class="lede">"AI checks the food and calorie count first, then we use inference servers to host and train our own models in parallel" is a real product direction, but the unit economics need to be settled before it's promised in marketing — a wrong or expensive estimate here is a recurring cost that scales with engagement, not a one-time build cost.</p>
+
+        <div class="callout">
+          <p><strong>What it actually costs, roughly</strong></p>
+          <p>A 2026 benchmark of vision-language models on dietary assessment found the cheapest strong performer running near <strong>$0.0006 per image</strong> (about $0.59 per 1,000 images) at the flash tier. That's the optimistic case — production food-logging apps typically run a cheaper model for first-pass dish identification and escalate only ambiguous cases to a stronger, pricier model. At a few meals logged per active user per day, this bill moves in lockstep with engagement — put it in the financial model next to server and support costs, not only in the one-time build budget.</p>
+        </div>
+
+        <div class="qs">
+          <table>
+            <tr><th>Approach</th><th>When it makes sense</th></tr>
+            <tr><td>Call a hosted vision API per photo</td><td>Default for launch and for most realistic scale — below roughly $50k/year of inference spend, an API is cheaper once you count engineering time, and it costs nothing when idle.</td></tr>
+            <tr><td>Hybrid: cheap triage model + escalation to a stronger model</td><td>Once volume is meaningful — keeps most photos cheap and reserves the expensive model for dishes the confirm-and-correct flow flags as wrong.</td></tr>
+            <tr><td>Self-host your own inference servers</td><td>Only past roughly $50k–500k/year of steady spend, and only once volume is predictable — self-hosting a mid-size open model typically needs several million tokens a day of throughput to break even against API pricing, and adds 10–20 hours a month of ongoing engineering work.</td></tr>
+            <tr><td>Train your own model from scratch</td><td>Only once you have your own labelled dataset of Indian dishes at real scale — treat this as a later step, not a v1 decision.</td></tr>
+          </table>
+        </div>
+
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Start on third-party vision APIs, not your own GPU fleet.</li>
+            <li>Self-hosting only becomes cheaper than API calls above meaningful, predictable volume, and it adds real ongoing engineering overhead that a small team will feel immediately.</li>
+            <li>Revisit self-hosting once usage and unit economics actually justify the fixed cost.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Use a cheap model as first-pass triage — dish identification and a rough portion guess — and escalate to a stronger model only for cases the user corrects or for genuinely ambiguous mixed dishes.</li>
+            <li>Most Indian home-cooked meals are exactly the "photo can't see the oil" case already flagged in §11, so budget for a confirm-and-correct UI rather than a fully automated pipeline; it also caps your per-photo cost directly.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Photo-based calorie apps run roughly 82% accurate against manual database entry — about a 12-point accuracy gap — which is an acceptable trade for a reported 90% reduction in logging time, but only if the product is honest about it (the same point §11 already makes).</li>
+            <li>Chasing that gap by always calling the most expensive model is doubly wrong: it's an expensive way to fix what's mostly a data problem — mixed Indian dishes and hidden oil — not a model-size problem.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Training or hosting your own model only pays off once you have a large enough labelled dataset of Indian dishes — which is itself the same kind of content investment already flagged for the exercise library in §3 and the food database in §11.</li>
+            <li>Sequence it: ship on third-party vision APIs first, treat every confirm/correct tap as free labelled training data, and only consider training your own model once that dataset is big enough to matter.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="s13">
+        <span class="num">Section 13</span>
+        <h2>Social sharing</h2>
+        <p class="lede">Sharing is a proven growth lever, but the same research that warns against public leaderboards in §10 applies here even more strongly — now it's someone's body, not their pace.</p>
+
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Make sharing a specific, chosen thing: a single workout-streak card, a specific personal record, a specific non-scale win ("did 10 real push-ups for the first time") — generated as an image the user reviews before it goes anywhere.</li>
+            <li>Never auto-post, never default-on.</li>
+          </ul>
+        </div>
+        <div class="item add">
+          <span class="tag">Add</span>
+          <ul>
+            <li>Route sharing through the standard OS share sheet (WhatsApp, Instagram Stories, and so on) rather than building an in-app public feed.</li>
+            <li>This gets distribution without your team moderating a social network, and WhatsApp-first sharing matches the India-first audience already prioritised in §11 and §14.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul>
+            <li>Research on fitness-app users found a consistent preference for private self-comparison over public comparison, exhibitionism and competition — most people actively avoid apps that push them toward being watched.</li>
+            <li>A default-public feed or an encouraged leaderboard actively works against retention for your actual audience, not just a privacy nice-to-have — this is the same finding already applied to activity tracking in §10.</li>
+          </ul>
+        </div>
+        <div class="item watch">
+          <span class="tag">Watch</span>
+          <ul><li>Sharing a progress photo or avatar (§9) is categorically more sensitive than sharing a streak number. Keep photo and avatar sharing several taps further away, with its own separate confirmation, and never fold it into a generic "share my progress" button.</li></ul>
+        </div>
+      </section>
+
+      <section id="s14">
+        <span class="num">Section 14</span>
         <h2>What your list doesn't have yet</h2>
 
         <h3>A reason to come back tomorrow</h3>
@@ -426,24 +810,24 @@
         </ul>
 
         <h3>Some form of accountability</h3>
-        <p>Training alone at home has no witness. A light social layer — train with a friend, see each other's week, nothing public and no leaderboards — addresses the actual reason home users quit. It's also the hardest thing for a bigger competitor to copy.</p>
+        <p>Training alone at home has no witness. A light social layer — train with a friend, see each other's week, nothing public and no leaderboards — addresses the actual reason home users quit. It's also the hardest thing for a bigger competitor to copy, and it's the same friend-circle mechanism §10 and §13 both lean on instead of a public feed.</p>
 
         <h3>Platform and data hygiene</h3>
         <ul class="plain">
-          <li>Sync with Google Fit, Samsung Health and Apple Health. Android sync failures generate roughly twice the complaints iOS does, and getting it right is a real differentiator on the platform where most of your users will be.</li>
+          <li>Sync with Google Fit, Samsung Health and Apple Health. Android sync failures generate roughly twice the complaints iOS does, and getting it right is a real differentiator on the platform where most of your users will be. This is also where the Strava-style activity data from §10 should live.</li>
           <li>Hindi first, then two or three more languages. English-only caps you at urban metros.</li>
           <li>Export my data, and delete my account, both reachable in two taps.</li>
         </ul>
 
         <h3>Business model, decided now</h3>
-        <p>Health and fitness has the highest install-to-revenue of any app category, and free trials perform better here than almost anywhere — trial users on annual plans end up worth more than direct buyers, because fitness goals need time to prove out. Decide early: free plan with a paid personalisation tier, priced in rupees with UPI autopay, and a separate higher global price if you also ship to the US and UK.</p>
+        <p>Health and fitness has the highest install-to-revenue of any app category, and free trials perform better here than almost anywhere — trial users on annual plans end up worth more than direct buyers, because fitness goals need time to prove out. Decide early: free plan with a paid personalisation tier, priced in rupees with UPI autopay, and a separate higher global price if you also ship to the US and UK. Factor the per-user AI inference cost from §12 into that pricing, since it scales with the exact behaviour — daily food logging — you're trying to encourage.</p>
 
         <h3>Accessibility and range</h3>
         <p>Larger text, chair-based variations, and a genuine beginner tier for a 45-year-old who hasn't exercised in a decade. Most apps are built for people who are already fit. The people who need you most are not.</p>
       </section>
 
-      <section id="s9">
-        <span class="num">Section 9</span>
+      <section id="s15">
+        <span class="num">Section 15</span>
         <h2>Build order</h2>
         <p class="lede">Everything above at once is a two-year project. Here's the cut.</p>
 
@@ -455,11 +839,13 @@
             <li>A generated week-one plan shown before any payment is mentioned</li>
             <li>80–120 home exercises with clean demo videos, each with an easier and harder variation</li>
             <li>Every session bookended with matched warm-up and cool-down</li>
+            <li>Calisthenics progressions and a selectable HIIT-style circuit, built on the same exercise and timer system (§4)</li>
             <li>Session player: timer, rest, voice cues, offline, screen-off capable</li>
             <li>"Too hard" and "too easy" buttons that change the next session</li>
             <li>Progress photos with ghost overlay, weekly weigh-in, session count</li>
-            <li>Simple food log with Indian portions and saved meals</li>
+            <li>Simple food log with Indian portions and saved meals, backed by a hosted vision API, not self-hosted inference (§12)</li>
             <li>One daily notification, user-scheduled</li>
+            <li>One-tap, opt-in "share this session" card via the OS share sheet — no public feed (§13)</li>
           </ul>
         </div>
 
@@ -467,8 +853,11 @@
           <h3>Version two</h3>
           <p class="when">Once people are finishing week four</p>
           <ul class="plain">
-            <li>Camera form check on four exercises, on-device only</li>
-            <li>Photo food recognition, pre-filling rather than deciding</li>
+            <li>Camera form check on four exercises, on-device only, video never leaves the phone (§5)</li>
+            <li>On-device fatigue detection from pose signals only — never raw frames — feeding the same intensity-adjustment idea already shipped as a manual button in v1 (§6)</li>
+            <li>Photo food recognition, pre-filling rather than deciding, with escalation to a stronger model only on correction (§12)</li>
+            <li>Avatar generation from two photos, on-device silhouette only (§9)</li>
+            <li>Private, opt-in activity logging for runs, walks and rides, syncing into the existing streak and Health-platform work (§10)</li>
             <li>Health-platform sync, wearables, Hindi</li>
             <li>Train-with-a-friend accountability</li>
             <li>Weekly recap and structured multi-week programmes</li>
@@ -481,12 +870,14 @@
           <ul class="plain">
             <li>The gym mode you originally planned — machine-based plans, plate and weight logging, rest-day splits</li>
             <li>Human coach layer, live sessions, gym partnerships</li>
+            <li>Self-hosted or custom-trained AI models, once inference volume and a labelled Indian-food dataset justify the fixed cost (§12)</li>
+            <li>Any public, aggregate, or leaderboard-style social feature — needs its own dedicated privacy review before it's even prototyped (§10, §13)</li>
           </ul>
         </div>
       </section>
 
-      <section id="s10">
-        <span class="num">Section 10</span>
+      <section id="s16">
+        <span class="num">Section 16</span>
         <h2>Open questions to settle before code</h2>
         <ul class="plain">
           <li>Who exactly is the first user — a 26-year-old in a Jaipur flat with two dumbbells, or a 40-year-old who has never trained? The plan generator, the tone and the video style all change with the answer.</li>
@@ -494,6 +885,8 @@
           <li>Who writes the progression logic — a certified trainer, or the engineering team? If it's the latter, hire a trainer as a consultant before launch. This is the part users can tell is fake.</li>
           <li>India-only or global from day one? It changes pricing, food database priority and language work.</li>
           <li>What does "score" mean numerically, and can it go down?</li>
+          <li>Is <strong>CasaFit</strong> the name? A casual search didn't surface an existing fitness app or registered trademark by that name, but that's not a clearance search — run the App Store and Play Store name check, the .com/.in domain check, and a proper trademark search (India Trademark Registry plus USPTO, software and fitness classes) before it's on a pitch deck.</li>
+          <li>Who owns the DPIA / consent-flow sign-off for anything in §6 and §9 that touches camera or biometric data — legal, or engineering? This needs an owner before either feature is prototyped, not after.</li>
         </ul>
       </section>
 
@@ -502,7 +895,22 @@
 
   <footer class="wrap" style="padding-left:0;padding-right:0">
     <a class="toplink" href="#top">Back to top</a>
-    <p>Working plan, September 2026. Market and user-behaviour figures cited in the accompanying research. Nothing here is medical advice; a qualified trainer should review the exercise programming before launch.</p>
+    <p>Working plan, revised September 2026. Market, cost and legal figures cited below; verify current pricing and regulatory detail before committing to a build. Nothing here is medical, financial or legal advice; a qualified trainer should review the exercise programming, and counsel should review the consent flows in §6 and §9, before launch.</p>
+    <h3 style="margin-top:1.6rem">Sources for this revision</h3>
+    <ol class="sources">
+      <li><a href="https://pubmed.ncbi.nlm.nih.gov/42619751/" target="_blank" rel="noopener">Vision-Language Models for Image-Based Dietary Assessment: a benchmark of accuracy, cost and prompt strategies across ten models — PubMed</a></li>
+      <li><a href="https://www.dpdpa.com/dpdpa2023/chapter-2/section4.html" target="_blank" rel="noopener">India's Digital Personal Data Protection Act, 2023 — Section 4, grounds for processing</a></li>
+      <li><a href="https://blog.mantratec.com/DPDP-Biometrics-Compliance" target="_blank" rel="noopener">DPDP compliance for biometrics — consent, retention and data flow</a></li>
+      <li><a href="https://www.privacyforge.ai/blog/special-categories-of-data-under-gdpr-complete-compliance-guide-2025" target="_blank" rel="noopener">Special categories of data under GDPR — compliance guide</a></li>
+      <li><a href="https://www.themomentum.ai/blog/gdpr-consent-requirements-health-data" target="_blank" rel="noopener">GDPR consent requirements for health data</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Strava" target="_blank" rel="noopener">Strava — features, heatmap and privacy history</a></li>
+      <li><a href="https://support.strava.com/en-us/articles/15401921-segment-leaderboard-guidelines" target="_blank" rel="noopener">Strava segment leaderboard guidelines</a></li>
+      <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10696712/" target="_blank" rel="noopener">Home-based high-intensity interval training and cardiorespiratory fitness — systematic review and meta-analysis</a></li>
+      <li><a href="https://www.researchgate.net/publication/399231359_The_Science_of_Calisthenics_Injury_Epidemiology_in_Street_Workout" target="_blank" rel="noopener">The science of calisthenics — injury epidemiology in street workout</a></li>
+      <li><a href="https://business.shapescale.com/content/posts/best-3d-body-scanner-apps" target="_blank" rel="noopener">3D body scanner apps for fitness tracking — on-device privacy approaches</a></li>
+      <li><a href="https://cloudzy.com/blog/self-hosting-open-weight-llm-gpu-vps-cost/" target="_blank" rel="noopener">Self-hosting an open-weight LLM vs. API — real cost math</a></li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7704278/" target="_blank" rel="noopener">Engagement features in physical-activity smartphone apps — focus-group study with sedentary people</a></li>
+    </ol>
   </footer>
 </div>
 
@@ -510,32 +918,64 @@
 (function(){
   var sections = Array.prototype.slice.call(document.querySelectorAll('main section[id]'));
   var links = Array.prototype.slice.call(document.querySelectorAll('nav.rail a[href^="#"], nav.jump a[href^="#"]'));
-  if(!sections.length || !links.length || !('IntersectionObserver' in window)) return;
 
-  function setActive(id){
-    links.forEach(function(a){
-      if(a.getAttribute('href') === '#' + id){
-        a.setAttribute('aria-current','true');
-        if(a.closest('.jump-inner')){
-          var bar = a.parentNode;
-          var left = a.offsetLeft - bar.clientWidth/2 + a.clientWidth/2;
-          bar.scrollTo({left: Math.max(0,left), behavior:'smooth'});
+  if(sections.length && links.length && ('IntersectionObserver' in window)){
+    function setActive(id){
+      links.forEach(function(a){
+        if(a.getAttribute('href') === '#' + id){
+          a.setAttribute('aria-current','true');
+          if(a.closest('.jump-inner')){
+            var bar = a.parentNode;
+            var left = a.offsetLeft - bar.clientWidth/2 + a.clientWidth/2;
+            bar.scrollTo({left: Math.max(0,left), behavior:'smooth'});
+          }
+        } else {
+          a.removeAttribute('aria-current');
         }
-      } else {
-        a.removeAttribute('aria-current');
+      });
+    }
+
+    var visible = {};
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ visible[e.target.id] = e.isIntersecting; });
+      for(var i=0;i<sections.length;i++){
+        if(visible[sections[i].id]){ setActive(sections[i].id); break; }
       }
-    });
+    }, {rootMargin: '-15% 0px -70% 0px', threshold: 0});
+
+    sections.forEach(function(s){ io.observe(s); });
   }
 
-  var visible = {};
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){ visible[e.target.id] = e.isIntersecting; });
-    for(var i=0;i<sections.length;i++){
-      if(visible[sections[i].id]){ setActive(sections[i].id); break; }
+  var fill = document.getElementById('progressFill');
+  if(fill){
+    function updateProgress(){
+      var doc = document.documentElement;
+      var scrollTop = window.pageYOffset || doc.scrollTop;
+      var height = doc.scrollHeight - doc.clientHeight;
+      var pct = height > 0 ? (scrollTop / height) * 100 : 0;
+      fill.style.width = Math.min(100, Math.max(0, pct)) + '%';
     }
-  }, {rootMargin: '-15% 0px -70% 0px', threshold: 0});
+    window.addEventListener('scroll', updateProgress, {passive:true});
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+  }
 
-  sections.forEach(function(s){ io.observe(s); });
+  var toggle = document.getElementById('themeToggle');
+  if(toggle){
+    var STORE_KEY = 'casafit-theme';
+    try{
+      var saved = localStorage.getItem(STORE_KEY);
+      if(saved === 'light' || saved === 'dark'){ document.documentElement.setAttribute('data-theme', saved); }
+    }catch(e){}
+    toggle.addEventListener('click', function(){
+      var current = document.documentElement.getAttribute('data-theme');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = current ? current === 'dark' : prefersDark;
+      var next = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try{ localStorage.setItem(STORE_KEY, next); }catch(e){}
+    });
+  }
 })();
 </script>
 
